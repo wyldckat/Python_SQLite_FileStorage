@@ -156,6 +156,7 @@ def main(argv):
             
             elif inputfolder:
                 storeFolderInDatabase(cur, compressionLevel, inputfolder)
+                con.commit()
                 print 'Folder "', inputfolder, '" has been stored.'
                 print 'Total database file size: ', os.stat(databasefile).st_size
             
