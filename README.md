@@ -13,7 +13,14 @@ Licensed as GPL v3.  See the file LICENSE in this directory or http://www.gnu.or
 How to install
 ==============
 
-You need LZO and Python with SQLite. LZO is only the non-standard one, for which the following instructions should work (at least on Linux):
+  * You need LZO and Python with SQLite for `PySQLite_Storage_File.py`
+  * You need Python with SQLite and BZip2 for `PySQLite_Storage_File_BZ2.py`
+
+
+Build and Install LZO
+---------------------
+
+LZO for Python is non-standard, but you can follow these instructions for building and installing in your home folder (at least on Linux):
 
 ```
 mkdir preparing
@@ -45,19 +52,23 @@ echo "You can now delete this folder: $PWD/preparing"
 echo "The resulting LZO files are located at $HOME/lzo"
 ```
 
-As for the script `PySQLite_Storage_File.py`, since this is only a proof of concept, you can either:
+
+Installing the Python scripts
+-----------------------------
+
+As for the scripts `PySQLite_Storage_File*.py`, since this is only a proof of concept, you can either:
 
   * Clone the repository https://github.com/wyldckat/Python_SQLite_FileStorage.git
   * Or download and unzip the file https://github.com/wyldckat/Python_SQLite_FileStorage/archive/master.zip
 
-If you want the script to be executable on Linux, run:
+If you want the scripts to be executable on Linux, run:
 
 ```
-chmod +x PySQLite_Storage_File.py
+chmod +x PySQLite_Storage_File*.py
 ```
 
 
-How to use `PySQLite_Storage_File.py`
+How to use `PySQLite_Storage_File*.py`
 =====================================
 
 First of all, the LZO libraries need to be in Python's search path. To do this, run:
@@ -66,10 +77,15 @@ First of all, the LZO libraries need to be in Python's search path. To do this, 
 
 Then to run the script, here are the several options:
 
-  * To create the database file: `test.py -c -d <databaseFile>`
-  * To list files inside the database file: `test.py -l -d <databaseFile>`
-  * To store a file without compression: `test.py -s -d <database> -i <inputfile>`
-  * To store a folder without compression: `test.py -s -d <database> -f <inputfolder>`
-  * To store file with compression: `test.py -s -z <0-9> -d <database> -i <inputfile>`
-  * To store folder with compression: `test.py -s -z <0-9> -d <database> -f <inputfolder>`
-  * To get the file back: `test.py -e -d <database> -i <file2extract> -o <outputfile>`
+  * To create the database file: `script.py -c -d <databaseFile>`
+  * To list files inside the database file: `script.py -l -d <databaseFile>`
+  * To store a file without compression: `script.py -s -d <database> -i <inputfile>`
+  * To store a folder without compression: `script.py -s -d <database> -f <inputfolder>`
+  * To store file with compression: `script.py -s -z <0-9> -d <database> -i <inputfile>`
+  * To store folder with compression: `script.py -s -z <0-9> -d <database> -f <inputfolder>`
+  * To get the file back: `script.py -e -d <database> -i <file2extract> -o <outputfile>`
+
+Where `script.py` can be any of the following:
+
+  * You need LZO and Python with SQLite for `PySQLite_Storage_File.py`
+  * You need Python with SQLite and BZip2 for `PySQLite_Storage_File_BZ2.py`

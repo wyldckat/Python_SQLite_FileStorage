@@ -12,7 +12,7 @@
 import sqlite3
 import sys, getopt
 import os
-import lzo
+import bz2
 
 def createDatabase(cur):
 
@@ -40,7 +40,7 @@ def storeInDatabase(cur, compressionLevel, filePathAndName):
     i.close()
     
     if compressionLevel > 0:
-        ldata = lzo.compress(data, compressionLevel)
+        ldata = bz2.compress(data, compressionLevel)
         data = ldata
 
     cur.execute("INSERT INTO map (name, compression, data_file) values (?, ?, ?) ",
@@ -63,7 +63,7 @@ def retrieveFromDatabase(cur, inputFile, outputFile):
     data = row[1]
 
     if row[0] > 0:
-        ldata = lzo.decompress(data)
+        ldata = bz2.decompress(data)
         data = ldata
     
     i = open(outputFile, 'wb')
@@ -90,7 +90,7 @@ def main(argv):
     compressionLevel = 0
 
     try:
-        opts, args = getopt.getopt(argv,"hcselz:d:i:f:o:",["lzo=","dfile=","ifile=","folder=","ofile="])
+        opts, args = getopt.getopt(argv,"hcselz:d:i:f:o:",["bz2=","dfile=","ifile=","folder=","ofile="])
         
     except getopt.GetoptError:
         showHelp()
@@ -114,7 +114,7 @@ def main(argv):
         elif opt == '-l':
             listFiles = True
 
-        elif opt in ("-z", "--lzo"):
+        elif opt in ("-z", "--bz2"):
             compressionLevel = int(arg)
 
         elif opt in ("-d", "--dfile"):
