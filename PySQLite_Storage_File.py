@@ -9,40 +9,51 @@
 # http://www.gnu.org/licenses/, for a description of the 
 # GNU General Public License terms under which you can copy the files.
 
-import StringIO
 import sqlite3
 import sys, getopt
 import os
+import lzo
 
 def createDatabase(cur):
 
     cur.execute('''CREATE TABLE map (
         name varchar(260) NOT NULL PRIMARY KEY,
+        compression INTEGER NOT NULL,
         data_file blob NOT NULL
         );''')
 
 def showHelp():
     print 'test.py -c -d <database>'
     print 'test.py -s -d <database> -i <inputfile>'
+    print 'test.py -s -z <0-9> -d <database> -i <inputfile>'
     print 'test.py -e -d <database> -i <file2extract> -o <outputfile>'
 
 
-def storeInDatabase(cur, filePathAndName):
+def storeInDatabase(cur, compressionLevel, filePathAndName):
 
     i = open(filePathAndName, 'rb')
     data = i.read()
     i.close()
+    
+    if compressionLevel > 0:
+        ldata = lzo.compress(data, compressionLevel)
+        data = ldata
 
-    cur.execute("INSERT INTO map (name, data_file) values (?, ?) ",
-                (filePathAndName, sqlite3.Binary(data))
+    cur.execute("INSERT INTO map (name, compression, data_file) values (?, ?, ?) ",
+                (filePathAndName, compressionLevel, sqlite3.Binary(data))
                )
 
+               
 def retrieveFromDatabase(cur, inputFile, outputFile):
 
-    cur.execute("SELECT data_file FROM map WHERE name = ?", (inputFile,))
-    data = cur.fetchone()[0]
-    #udata = StringIO.StringIO(data)
+    cur.execute("SELECT compression,data_file FROM map WHERE name = ?", (inputFile,))
+    row = cur.fetchone()
+    data = row[1]
 
+    if row[0] > 0:
+        ldata = lzo.decompress(data)
+        data = ldata
+    
     i = open(outputFile, 'wb')
     i.write(data)
     i.close()
@@ -55,9 +66,10 @@ def main(argv):
     create = False
     store = False
     extract = False
+    compressionLevel = 0
 
     try:
-        opts, args = getopt.getopt(argv,"hcsed:i:o:",["dfile=","ifile=","ofile="])
+        opts, args = getopt.getopt(argv,"hcsez:d:i:o:",["lzo=","dfile=","ifile=","ofile="])
         
     except getopt.GetoptError:
         showHelp()
@@ -77,6 +89,9 @@ def main(argv):
             
         elif opt == '-e':
             extract = True
+
+        elif opt in ("-z", "--lzo"):
+            compressionLevel = arg
 
         elif opt in ("-d", "--dfile"):
             databasefile = arg
@@ -107,7 +122,7 @@ def main(argv):
         
     elif store:
         try:
-            storeInDatabase(cur, inputfile)
+            storeInDatabase(cur, compressionLevel, inputfile)
             con.commit()
             print 'File "', inputfile, '" has been stored.'
             print 'Total database file size: ', os.stat(databasefile).st_size
