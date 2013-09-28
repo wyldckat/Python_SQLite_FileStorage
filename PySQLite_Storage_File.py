@@ -26,7 +26,9 @@ def showHelp():
     print 'test.py -c -d <database>'
     print 'test.py -l -d <database>'
     print 'test.py -s -d <database> -i <inputfile>'
+    print 'test.py -s -d <database> -f <inputfolder>'
     print 'test.py -s -z <0-9> -d <database> -i <inputfile>'
+    print 'test.py -s -z <0-9> -d <database> -f <inputfolder>'
     print 'test.py -e -d <database> -i <file2extract> -o <outputfile>'
 
 
@@ -45,6 +47,14 @@ def storeInDatabase(cur, compressionLevel, filePathAndName):
                )
 
                
+def storeFolderInDatabase(cur, compressionLevel, folderPathAndName):
+    
+    for r,d,f in os.walk(folderPathAndName):
+        for files in f:
+            filePathAndName = os.path.join(r,files)
+            storeInDatabase(cur, compressionLevel, filePathAndName)
+            print "File stored: ", filePathAndName
+
 def retrieveFromDatabase(cur, inputFile, outputFile):
 
     cur.execute("SELECT compression,data_file FROM map WHERE name = ?", (inputFile,))
@@ -70,6 +80,7 @@ def listFilesOnDatabase(cur):
 def main(argv):
     databasefile = ''
     inputfile = ''
+    inputfolder = ''
     outputfile = ''
     create = False
     store = False
@@ -78,7 +89,7 @@ def main(argv):
     compressionLevel = 0
 
     try:
-        opts, args = getopt.getopt(argv,"hcselz:d:i:o:",["lzo=","dfile=","ifile=","ofile="])
+        opts, args = getopt.getopt(argv,"hcselz:d:i:f:o:",["lzo=","dfile=","ifile=","folder=","ofile="])
         
     except getopt.GetoptError:
         showHelp()
@@ -108,6 +119,9 @@ def main(argv):
         elif opt in ("-d", "--dfile"):
             databasefile = arg
 
+        elif opt in ("-f", "--folder"):
+            inputfolder = arg
+
         elif opt in ("-i", "--ifile"):
             inputfile = arg
 
@@ -134,19 +148,34 @@ def main(argv):
         
     elif store:
         try:
-            storeInDatabase(cur, compressionLevel, inputfile)
-            con.commit()
-            print 'File "', inputfile, '" has been stored.'
-            print 'Total database file size: ', os.stat(databasefile).st_size
+            if inputfile:
+                storeInDatabase(cur, compressionLevel, inputfile)
+                con.commit()
+                print 'File "', inputfile, '" has been stored.'
+                print 'Total database file size: ', os.stat(databasefile).st_size
+            
+            elif inputfolder:
+                storeFolderInDatabase(cur, compressionLevel, inputfolder)
+                print 'Folder "', inputfolder, '" has been stored.'
+                print 'Total database file size: ', os.stat(databasefile).st_size
+            
+            else:
+                print "Missing input file or folder of some kind."
+                showHelp()
 
         except sqlite3.IntegrityError:
             print 'Failed to store file in database'
 
     elif extract:
         try:
-            data = retrieveFromDatabase(cur, inputfile, outputfile)
-            print 'File "', inputfile, '" has extracted to "', outputfile, '".'
+            if inputfile and outputfile:
+                data = retrieveFromDatabase(cur, inputfile, outputfile)
+                print 'File "', inputfile, '" has extracted to "', outputfile, '".'
 
+            else:
+                print "Missing input and/or output file or folder of some kind."
+                showHelp()
+                
         except sqlite3.IntegrityError:
             print 'Failed to extract file from database'
             

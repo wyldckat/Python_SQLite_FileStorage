@@ -69,5 +69,7 @@ Then to run the script, here are the several options:
   * To create the database file: `test.py -c -d <databaseFile>`
   * To list files inside the database file: `test.py -l -d <databaseFile>`
   * To store a file without compression: `test.py -s -d <database> -i <inputfile>`
-  * To store with compression: `test.py -s -z <0-9> -d <database> -i <inputfile>`
+  * To store a folder without compression: `test.py -s -d <database> -f <inputfolder>`
+  * To store file with compression: `test.py -s -z <0-9> -d <database> -i <inputfile>`
+  * To store folder with compression: `test.py -s -z <0-9> -d <database> -f <inputfolder>`
   * To get the file back: `test.py -e -d <database> -i <file2extract> -o <outputfile>`
