@@ -13,7 +13,7 @@ Licensed as GPL v3.  See the file LICENSE in this directory or http://www.gnu.or
 How to install
 ==============
 
-You need LZO and Python with SQLite. LZO is only the non-standard one, for which the following instructions should work:
+You need LZO and Python with SQLite. LZO is only the non-standard one, for which the following instructions should work (at least on Linux):
 
 ```
 mkdir preparing
