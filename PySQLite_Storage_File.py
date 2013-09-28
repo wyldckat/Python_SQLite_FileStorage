@@ -91,7 +91,7 @@ def main(argv):
             extract = True
 
         elif opt in ("-z", "--lzo"):
-            compressionLevel = arg
+            compressionLevel = int(arg)
 
         elif opt in ("-d", "--dfile"):
             databasefile = arg
