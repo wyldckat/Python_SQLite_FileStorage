@@ -24,6 +24,7 @@ def createDatabase(cur):
 
 def showHelp():
     print 'test.py -c -d <database>'
+    print 'test.py -l -d <database>'
     print 'test.py -s -d <database> -i <inputfile>'
     print 'test.py -s -z <0-9> -d <database> -i <inputfile>'
     print 'test.py -e -d <database> -i <file2extract> -o <outputfile>'
@@ -57,7 +58,14 @@ def retrieveFromDatabase(cur, inputFile, outputFile):
     i = open(outputFile, 'wb')
     i.write(data)
     i.close()
+
     
+def listFilesOnDatabase(cur):
+    print "File list:"
+
+    for row in cur.execute("SELECT name FROM map"):
+        print "    ", row[0]
+
 
 def main(argv):
     databasefile = ''
@@ -66,10 +74,11 @@ def main(argv):
     create = False
     store = False
     extract = False
+    listFiles = False
     compressionLevel = 0
 
     try:
-        opts, args = getopt.getopt(argv,"hcsez:d:i:o:",["lzo=","dfile=","ifile=","ofile="])
+        opts, args = getopt.getopt(argv,"hcselz:d:i:o:",["lzo=","dfile=","ifile=","ofile="])
         
     except getopt.GetoptError:
         showHelp()
@@ -89,6 +98,9 @@ def main(argv):
             
         elif opt == '-e':
             extract = True
+
+        elif opt == '-l':
+            listFiles = True
 
         elif opt in ("-z", "--lzo"):
             compressionLevel = int(arg)
@@ -137,6 +149,13 @@ def main(argv):
 
         except sqlite3.IntegrityError:
             print 'Failed to extract file from database'
+            
+    elif listFiles:
+        try:
+            data = listFilesOnDatabase(cur)
+
+        except sqlite3.IntegrityError:
+            print 'Failed to list files on database'
 
 
 if __name__ == '__main__':
