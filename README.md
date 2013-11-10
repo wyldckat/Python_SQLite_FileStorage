@@ -5,6 +5,8 @@ Simple Python script for storing/extracting files inside a single SQLite databas
 
 Based on "Storing an image into SQLite": http://mornie.org/blog/2007/01/10/Storing-binary-data-in-SQLite/ - by Eriol (@mornie.org)
 
+GZip version based on "HTTP Compression in python and jython": http://jython.xhaus.com/http-compression-in-python-and-jython/#gzip
+
 Developed by Bruno Santos <wyldckat@github> September 2013
 
 Licensed as GPL v3.  See the file LICENSE in this directory or http://www.gnu.org/licenses/, for a description of the GNU General Public License terms under which you can copy the files.
@@ -15,6 +17,7 @@ How to install
 
   * You need LZO and Python with SQLite for `PySQLite_Storage_File.py`
   * You need Python with SQLite and BZip2 for `PySQLite_Storage_File_BZ2.py`
+  * You need Python with SQLite and GZip for `PySQLite_Storage_File_gzip.py`
 
 
 Build and Install LZO
