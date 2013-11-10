@@ -53,7 +53,12 @@ def storeFolderInDatabase(cur, compressionLevel, folderPathAndName):
     for r,d,f in os.walk(folderPathAndName):
         for files in f:
             filePathAndName = os.path.join(r,files)
+
+            if filePathAndName.startswith("./"):
+                filePathAndName = filePathAndName.replace("./","")
+
             storeInDatabase(cur, compressionLevel, filePathAndName)
+
             print "File stored: ", filePathAndName
 
 def retrieveFromDatabase(cur, inputFile, outputFile):
